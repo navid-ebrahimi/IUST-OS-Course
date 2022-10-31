@@ -18,18 +18,18 @@ void Remove_str(char str[], int start, int repeat)
 {
     for(int j = 0; j < repeat; j++)
     {
-        for (int i = start; i < 100; i++)
+        for (int i = start; i < 200; i++)
         {
             str[i] = str[i+1];
         }
     }
 }
 
-void delete_comma(char str[])
+void delete_space(char str[])
 {
-    for(int i = 0; str[i] != '\n'; i++)
+    for(int i = 0; i<200; i++)
     {
-        if (str[i] == ',')
+        if (str[i] == ' ')
         {
             Remove_str(str, i, 1);
         }
@@ -72,11 +72,11 @@ int Compute_Sum(int numbers[], int end)
 int* Split_numbers(char detail[], int start, int end, int n, int* len)
 {
     int j=0;int ctr=0;
-    char newString[n][20];
+    char newString[n][200];
     int* numbers = (int*) malloc(3*n*sizeof(int));
     for(int k=start;k<= end;k++)
     {
-        if(detail[k]==' '||detail[k]=='\0' || detail[k] == '\n' || detail[k] == '}')
+        if(detail[k]==','|| detail[k]=='\0' || detail[k] == '\n' || detail[k] == '}')
         {
             newString[ctr][j]='\0';
             numbers[ctr] = char_to_int(newString[ctr]);
@@ -96,6 +96,8 @@ int* Split_numbers(char detail[], int start, int end, int n, int* len)
 int len_int(int n)
 {
     int len = 0;
+    if (n == 0)
+        len++;
     while(n!=0)
     {
         len++;
@@ -106,12 +108,12 @@ int len_int(int n)
 
 int Compute(char str[])
 {
-    for(int j = 0; j<100;j++)
+    for(int j = 0; j<200;j++)
     {
         int s = 0;
         int final_s;
-        int final_e = 100;
-        for(int i = 0; i < 20 && str[i] != '\n'; i++)
+        int final_e = 200;
+        for(int i = 0; i < 200 ; i++)
         {
             if (str[i] == '{') 
             {
@@ -125,9 +127,9 @@ int Compute(char str[])
         }
         int len;
         int *numbers;
-        numbers = Split_numbers(str, final_s+1, final_e, 100, &len);
+        numbers = Split_numbers(str, final_s+1, final_e, 200, &len);
         int sum = Compute_Sum(numbers,len);
-        if (sum == 0)
+        if (sum == 0 && final_e == 200)
             break;
         Remove_str(str, final_e, 1);
         Remove_str(str, final_s, final_e - final_s - len_int(sum));
@@ -145,9 +147,9 @@ int Compute(char str[])
 
 int main(int argc, char const *argv[])
 {
-    char* str = (char*) malloc(100*sizeof(char));
+    char* str = (char*) malloc(200*sizeof(char));
     scanf("%[^\n]s", str);
-    delete_comma(str);
+    delete_space(str);
     Compute(str);
     return 0;
 }
