@@ -4,12 +4,35 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
+#include <pthread.h>
+
 
 
 // in your browser type: http://localhost:8090
 // IF error: address in use then change the PORT number
-#define PORT 8090
+#define PORT 8084
 
+typedef struct 
+{
+    int new_socket;
+} 
+server;
+
+void* myThreadFunc(void* arg)
+{
+    server *args = (server *) arg;
+    char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+	char buffer[30000] = {0};
+    long valread = read( args -> new_socket , buffer, 30000);
+    printf("%s\n",buffer );
+    // uncomment following line and connect many clients
+    sleep(1);
+    write(args -> new_socket , hello , strlen(hello));
+    printf("-------------Hello message sent---------------");
+    close(args -> new_socket);
+    // pthread_exit(NULL);
+    return NULL;
+}
 
 int main(int argc, char const *argv[])
 {
@@ -51,25 +74,10 @@ int main(int argc, char const *argv[])
             perror("In accept");
             exit(EXIT_FAILURE);
         }
-        
-        char buffer[30000] = {0};
-        pid_t pid = fork();
-        if (pid == 0)
-        {
-            valread = read( new_socket , buffer, 30000);
-            printf("%s\n",buffer );
-        
-            // uncomment following line and connect many clients
-            sleep(5);
-            write(new_socket , hello , strlen(hello));
-            printf("-------------Hello message sent---------------");
-            close(new_socket);
-            exit(0);
-        }
-        else
-        {
-            close(new_socket);
-        }
+        pthread_t tid;
+        server* thread_server = (server*)malloc(sizeof(server));
+        thread_server -> new_socket = new_socket;
+        pthread_create(&tid, NULL, myThreadFunc, thread_server);
     }
     return 0;
 }

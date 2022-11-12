@@ -1,5 +1,3 @@
-// Merge sort code: https://www.geeksforgeeks.org/c-program-for-merge-sort/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <syscall.h>
@@ -8,8 +6,7 @@
 #include <string.h>
 #include <unistd.h> 
 
-int m_prim = 0;
-int sign = 0;
+#define FLOAT_TO_INT(x) ((x)>=0?(int)((x)+0.5):(int)((x)-0.5))
 
 void merge(int arr[], int l, int m, int r)
 {
@@ -56,11 +53,6 @@ void mergeSort(int arr[], int l, int r)
 {
     if (l < r) {
         int m = l + (r - l) / 2;
-        if (sign == 0)
-        {
-            m = m_prim;
-            sign++;
-        }
         mergeSort(arr, l, m);
         mergeSort(arr, m + 1, r);
         merge(arr, l, m, r);
@@ -97,10 +89,8 @@ int* merge_sort_with_vfork(int* arr, int size, int count_of_sections)
         extractElements(arr, subArray, start, end);
         if(pid == 0)
         {
-            sign=1;
             mergeSort(subArray, 0, count_of_sections - 1);
             replaceElements(arr, subArray, start, end);
-            free(subArray);
             exit(0);
         }
 
@@ -109,12 +99,11 @@ int* merge_sort_with_vfork(int* arr, int size, int count_of_sections)
             wait(NULL);
         }
     }
-    int sum = 0;
+    int m_prim = 1;
     for (int i = 2; i <= number_of_groups; i++)
     {
-        sign = 0;
-        m_prim += count_of_sections - 1;
-        mergeSort(arr, 0, (i) * count_of_sections - 1);
+        merge(arr, 0, m_prim, (i) * count_of_sections - 1);
+        m_prim += count_of_sections;
     }
     
     return arr;
@@ -136,6 +125,5 @@ int main(int argc, char const *argv[])
         printf("%d ", arr[i]);
     }
     printf("\n");
-    free(arr);
     return 0;
 }

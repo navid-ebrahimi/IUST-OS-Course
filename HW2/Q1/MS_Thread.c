@@ -9,8 +9,8 @@
 #include <unistd.h> 
 #include <pthread.h>
 
-int m_prim = 0;
-int sign = 0;
+#define FLOAT_TO_INT(x) ((x)>=0?(int)((x)+0.5):(int)((x)-0.5))
+
 
 typedef struct 
 {
@@ -67,11 +67,6 @@ void mergeSort(int arr[], int l, int r)
 {
     if (l < r) {
         int m = l + (r - l) / 2;
-        if (sign == 0)
-        {
-            m = m_prim;
-            sign++;
-        }
         mergeSort(arr, l, m);
         mergeSort(arr, m + 1, r);
         merge(arr, l, m, r);
@@ -101,7 +96,6 @@ void* for_loop_thread(void *arg)
 {
     thread_data *args = (thread_data *) arg;
     extractElements(args->arr, args->subArray, args->start, args->end);
-    sign=1;
     mergeSort(args->subArray, 0, args->count_of_sections - 1);
     replaceElements(args->arr, args->subArray, args->start, args->end);
 }
@@ -119,12 +113,11 @@ void* merge_sort_with_thread(int* arr, int size, int count_of_sections)
         pthread_join(tid, NULL);
         free(subArray);
     }
-    int sum = 0;
+    int m_prim = 1;
     for (int i = 2; i <= number_of_groups; i++)
     {
-        sign = 0;
-        m_prim += count_of_sections - 1;
-        mergeSort(arr, 0, (i) * count_of_sections - 1);
+        merge(arr, 0, m_prim, (i) * count_of_sections - 1);
+        m_prim += count_of_sections;
     }
 }
 
